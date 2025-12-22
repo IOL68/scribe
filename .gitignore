@@ -50,3 +50,4 @@ Thumbs.db
 *.json
 !pyproject.toml
 *.docx
+pretrained_models/

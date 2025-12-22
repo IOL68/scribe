@@ -7,7 +7,7 @@ CLI para transcripción de audio con detección de speakers y timestamps.
 ## Instalación
 
 ```bash
-pip install scribe-cli
+curl -sSL https://raw.githubusercontent.com/ivanlandaverde/scribe/main/install.sh | bash
 ```
 
 ## Uso
@@ -16,14 +16,14 @@ pip install scribe-cli
 # Básico
 scribe entrevista.mp3
 
-# Con opciones
-scribe entrevista.mp3 --speakers 2 --lang es --format json,srt,txt
+# Con formato DOCX (estilo profesional LAI)
+scribe entrevista.mp3 --format docx
 
-# Ver modelos disponibles
-scribe list-models
+# Especificar speakers e idioma
+scribe entrevista.mp3 --speakers 2 --lang es --format docx
 
-# Descargar modelo específico
-scribe download small
+# Múltiples formatos
+scribe entrevista.mp3 --format json,srt,txt,docx
 ```
 
 ## Opciones
@@ -35,14 +35,13 @@ scribe download small
 | `--model`, `-m` | Modelo Whisper (tiny, base, small, medium, large) | small |
 | `--format`, `-f` | Formatos de salida (json,srt,txt,docx) | json |
 | `--output`, `-o` | Nombre archivo de salida | mismo nombre del audio |
-| `--proofread`, `-p` | Marcar segmentos con baja confianza | false |
 
 ## Formatos de salida
 
 - **JSON** - Completo con metadata, ideal para programadores
 - **SRT** - Subtítulos, compatible con reproductores de video
 - **TXT** - Texto simple legible
-- **DOCX** - Documento Word editable para correcciones
+- **DOCX** - Documento Word con formato profesional LAI
 
 ## Modelos
 
@@ -53,26 +52,6 @@ scribe download small
 | small | 460 MB | Normal | Buena |
 | medium | 1.5 GB | Lento | Alta |
 | large | 3 GB | Muy lento | Máxima |
-
-## Ejemplo de salida
-
-```json
-{
-  "audio": "entrevista.mp3",
-  "duration": 3600,
-  "language": "es",
-  "speakers": 2,
-  "segments": [
-    {
-      "start": 0.0,
-      "end": 4.5,
-      "speaker": "Speaker 1",
-      "text": "Bienvenidos, hoy tenemos un invitado especial.",
-      "confidence_score": 0.97
-    }
-  ]
-}
-```
 
 ## Licencia
 
