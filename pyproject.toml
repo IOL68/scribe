@@ -38,6 +38,7 @@ dependencies = [
     "soundfile>=0.12.0",
     "scipy>=1.10.0",
     "numpy>=1.24.0,<2.0.0",
+    "gradio>=4.0.0",
 ]
 
 [project.optional-dependencies]
@@ -53,6 +54,7 @@ dev = [
 
 [project.scripts]
 scribe = "scribe.cli:main"
+scribe-ui = "scribe.ui:main"
 
 [project.urls]
 Homepage = "https://github.com/ivanlandaverde/scribe"

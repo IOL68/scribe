@@ -1,16 +1,36 @@
 # Scribe
 
-CLI para transcripción de audio con detección de speakers y timestamps.
+CLI y UI para transcripción de audio con detección de speakers y timestamps.
 
 100% local - tus audios nunca salen de tu computadora.
 
-## Instalación
+## Instalación (macOS)
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/ivanlandaverde/scribe/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/IOL68/scribe/main/install.sh | bash
+```
+
+O manualmente:
+
+```bash
+brew install whisper-cpp ffmpeg python@3.11
+python3.11 -m pip install git+https://github.com/IOL68/scribe.git
 ```
 
 ## Uso
+
+### Interfaz gráfica (recomendado)
+
+```bash
+scribe-ui
+```
+
+Abre una ventana en tu navegador donde puedes:
+- Arrastrar y soltar archivos de audio
+- Seleccionar idioma, speakers y formato
+- Descargar el archivo transcrito
+
+### Línea de comandos
 
 ```bash
 # Básico
@@ -21,12 +41,9 @@ scribe entrevista.mp3 --format docx
 
 # Especificar speakers e idioma
 scribe entrevista.mp3 --speakers 2 --lang es --format docx
-
-# Múltiples formatos
-scribe entrevista.mp3 --format json,srt,txt,docx
 ```
 
-## Opciones
+## Opciones CLI
 
 | Flag | Descripción | Default |
 |------|-------------|---------|
@@ -38,20 +55,16 @@ scribe entrevista.mp3 --format json,srt,txt,docx
 
 ## Formatos de salida
 
+- **DOCX** - Documento Word con formato profesional LAI
 - **JSON** - Completo con metadata, ideal para programadores
 - **SRT** - Subtítulos, compatible con reproductores de video
 - **TXT** - Texto simple legible
-- **DOCX** - Documento Word con formato profesional LAI
 
-## Modelos
+## Requisitos
 
-| Modelo | Tamaño | Velocidad | Precisión |
-|--------|--------|-----------|-----------|
-| tiny | 39 MB | Muy rápido | Baja |
-| base | 140 MB | Rápido | Media |
-| small | 460 MB | Normal | Buena |
-| medium | 1.5 GB | Lento | Alta |
-| large | 3 GB | Muy lento | Máxima |
+- macOS (Apple Silicon o Intel)
+- Python 3.11
+- Homebrew
 
 ## Licencia
 

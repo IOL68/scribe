@@ -1,6 +1,6 @@
 #!/bin/bash
 # Instalador de Scribe CLI
-# Uso: curl -sSL https://raw.githubusercontent.com/ivanlandaverde/scribe/main/install.sh | bash
+# Uso: curl -sSL https://raw.githubusercontent.com/IOL68/scribe/main/install.sh | bash
 
 set -e
 
@@ -15,12 +15,12 @@ if ! command -v brew &> /dev/null; then
 fi
 
 # Instalar dependencias del sistema
-echo "Instalando whisper-cpp y ffmpeg..."
-brew install whisper-cpp ffmpeg
+echo "Instalando dependencias..."
+brew install whisper-cpp ffmpeg python@3.11
 
-# Instalar scribe
+# Instalar scribe con Python 3.11
 echo "Instalando Scribe..."
-pip3 install scribe-cli
+/opt/homebrew/bin/python3.11 -m pip install git+https://github.com/IOL68/scribe.git
 
 echo ""
 echo "==================================="
