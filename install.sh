@@ -24,12 +24,11 @@ brew install whisper-cpp ffmpeg python@3.11
 # Instalar pipx si no existe
 if ! command -v pipx &> /dev/null; then
     /opt/homebrew/bin/python3.11 -m pip install --user pipx
-    export PATH="$HOME/.local/bin:$PATH"
 fi
 
 # Instalar scribe con pipx usando Python 3.11
 echo "Instalando Scribe..."
-pipx install git+https://github.com/IOL68/scribe.git --python /opt/homebrew/bin/python3.11 --force
+~/.local/bin/pipx install git+https://github.com/IOL68/scribe.git --python /opt/homebrew/bin/python3.11 --force
 
 # Crear symlinks en /opt/homebrew/bin para acceso directo
 ln -sf ~/.local/bin/scribe /opt/homebrew/bin/scribe 2>/dev/null || true
