@@ -18,9 +18,15 @@ fi
 echo "Instalando dependencias..."
 brew install whisper-cpp ffmpeg python@3.11
 
-# Instalar scribe con Python 3.11
+# Instalar scribe con Python 3.11 (--user para no requerir sudo)
 echo "Instalando Scribe..."
-/opt/homebrew/bin/python3.11 -m pip install git+https://github.com/IOL68/scribe.git
+/opt/homebrew/bin/python3.11 -m pip install --user git+https://github.com/IOL68/scribe.git
+
+# Agregar ~/.local/bin al PATH si no está
+if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+    echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
+    export PATH="$HOME/.local/bin:$PATH"
+fi
 
 echo ""
 echo "==================================="
