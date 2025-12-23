@@ -3,6 +3,8 @@ CLI principal de Scribe
 """
 
 import click
+import subprocess
+import sys
 import tempfile
 from pathlib import Path
 from rich.console import Console
@@ -22,8 +24,31 @@ VALID_FORMATS = ["json", "srt", "txt", "docx"]
 VALID_MODELS = ["tiny", "base", "small", "medium", "large"]
 
 
+def do_update(ctx, param, value):
+    """Actualiza scribe a la última versión"""
+    if not value or ctx.resilient_parsing:
+        return
+    console.print("[cyan]Actualizando Scribe...[/cyan]")
+    try:
+        result = subprocess.run(
+            ["/opt/homebrew/bin/pipx", "install",
+             "git+https://github.com/IOL68/scribe.git",
+             "--python", "/opt/homebrew/bin/python3.11", "--force"],
+            capture_output=True,
+            text=True
+        )
+        if result.returncode == 0:
+            console.print("[green]Scribe actualizado correctamente![/green]")
+        else:
+            console.print(f"[red]Error al actualizar:[/red] {result.stderr}")
+    except Exception as e:
+        console.print(f"[red]Error:[/red] {e}")
+    ctx.exit()
+
+
 @click.command()
-@click.argument("audio_file", type=click.Path(exists=True))
+@click.argument("audio_file", type=click.Path(exists=True), required=False)
+@click.option("--update", is_flag=True, callback=do_update, expose_value=False, is_eager=True, help="Actualizar a la última versión")
 @click.option("--speakers", "-s", default="auto", help="Número de speakers ('auto' o número)")
 @click.option("--lang", "-l", default="auto", help="Idioma (es, en, auto)")
 @click.option("--model", "-m", default="small", type=click.Choice(VALID_MODELS), help="Modelo Whisper")
@@ -39,7 +64,14 @@ def main(audio_file, speakers, lang, model, formats, output, proofread, verify):
     \b
     Ejemplo:
         scribe entrevista.mp3 --speakers 2 --lang es
+        scribe --update  (actualizar a última versión)
     """
+    if not audio_file:
+        console.print("[red]Error: Debes especificar un archivo de audio.[/red]")
+        console.print("Uso: scribe archivo.mp3 --format docx")
+        console.print("     scribe --update  (para actualizar)")
+        return
+
     audio_path = Path(audio_file)
 
     # Parsear formatos

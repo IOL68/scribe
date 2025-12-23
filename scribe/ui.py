@@ -13,6 +13,7 @@ from scribe.exporters.docx_exporter import export_docx
 from scribe.exporters.json_exporter import export_json
 from scribe.exporters.srt_exporter import export_srt
 from scribe.exporters.txt_exporter import export_txt
+from scribe.error_reporter import report_error
 
 
 def transcribe(audio_file, speakers, lang, format_type, model):
@@ -69,7 +70,9 @@ def transcribe(audio_file, speakers, lang, format_type, model):
         return str(output_path), summary
 
     except Exception as e:
-        return None, f"❌ Error: {str(e)}"
+        # Reportar error automáticamente a GitHub
+        report_error(e, context="UI - transcribiendo audio")
+        return None, f"❌ Error: {str(e)}\n\n_(Error reportado automáticamente)_"
 
 
 def create_ui():
