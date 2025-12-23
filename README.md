@@ -7,15 +7,14 @@ CLI y UI para transcripción de audio con detección de speakers y timestamps.
 ## Instalación (macOS)
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/IOL68/scribe/main/install.sh | bash
+bash -c "$(curl -sSL https://raw.githubusercontent.com/IOL68/scribe/main/install.sh)"
 ```
 
-O manualmente:
-
-```bash
-brew install whisper-cpp ffmpeg python@3.11
-python3.11 -m pip install git+https://github.com/IOL68/scribe.git
-```
+Esto instala automáticamente:
+- whisper-cpp (transcripción)
+- ffmpeg (procesamiento de audio)
+- Python 3.11
+- pipx y scribe
 
 ## Uso
 
@@ -43,6 +42,12 @@ scribe entrevista.mp3 --format docx
 scribe entrevista.mp3 --speakers 2 --lang es --format docx
 ```
 
+## Actualizar
+
+```bash
+scribe --update
+```
+
 ## Opciones CLI
 
 | Flag | Descripción | Default |
@@ -52,6 +57,8 @@ scribe entrevista.mp3 --speakers 2 --lang es --format docx
 | `--model`, `-m` | Modelo Whisper (tiny, base, small, medium, large) | small |
 | `--format`, `-f` | Formatos de salida (json,srt,txt,docx) | json |
 | `--output`, `-o` | Nombre archivo de salida | mismo nombre del audio |
+| `--update` | Actualizar a la última versión | - |
+| `--version` | Ver versión instalada | - |
 
 ## Formatos de salida
 
@@ -60,11 +67,37 @@ scribe entrevista.mp3 --speakers 2 --lang es --format docx
 - **SRT** - Subtítulos, compatible con reproductores de video
 - **TXT** - Texto simple legible
 
+## Instalación Linux (Ubuntu/Debian)
+
+```bash
+# 1. Dependencias
+sudo apt update
+sudo apt install -y ffmpeg build-essential cmake git python3-venv pipx
+
+# 2. Compilar whisper.cpp
+cd /tmp
+git clone https://github.com/ggerganov/whisper.cpp.git
+cd whisper.cpp && make
+sudo cp build/bin/whisper-cli /usr/local/bin/
+
+# 3. Instalar Scribe
+pipx ensurepath
+pipx install git+https://github.com/IOL68/scribe.git
+```
+
 ## Requisitos
 
-- macOS (Apple Silicon o Intel)
-- Python 3.11
-- Homebrew
+- macOS (Apple Silicon o Intel) o Linux
+- Python 3.11+
+- Homebrew (macOS) o apt (Linux)
+
+## Modelos
+
+La primera vez que ejecutes scribe, descargará automáticamente:
+- Modelo Whisper (~465MB para "small")
+- Modelos de diarización (~80MB)
+
+Después todo es 100% local.
 
 ## Licencia
 
