@@ -25,11 +25,9 @@ brew install whisper-cpp ffmpeg python@3.11
 echo "Instalando Scribe..."
 /opt/homebrew/bin/python3.11 -m pip install --user git+https://github.com/IOL68/scribe.git
 
-# Agregar ~/.local/bin al PATH si no está
-if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
-    echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
-    export PATH="$HOME/.local/bin:$PATH"
-fi
+# Crear symlinks en /opt/homebrew/bin para acceso directo
+ln -sf ~/.local/bin/scribe /opt/homebrew/bin/scribe 2>/dev/null || true
+ln -sf ~/.local/bin/scribe-ui /opt/homebrew/bin/scribe-ui 2>/dev/null || true
 
 echo ""
 echo "==================================="
