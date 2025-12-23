@@ -12,6 +12,9 @@ echo "==================================="
 if ! command -v brew &> /dev/null; then
     echo "Instalando Homebrew..."
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+    # Agregar Homebrew al PATH para esta sesión
+    eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
 # Instalar dependencias del sistema
