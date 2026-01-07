@@ -17,6 +17,7 @@ from .proofer import add_confidence_markers
 from .separator import separate_by_diarization, cleanup_temp_files
 from .comparator import compare_transcriptions
 from .exporters import export_json, export_srt, export_txt, export_docx
+from .error_reporter import report_error
 
 console = Console()
 
@@ -96,87 +97,93 @@ def main(audio_file, speakers, lang, model, formats, output, proofread, verify):
     console.print(f"  Proofread: [cyan]{'Sí' if proofread else 'No'}[/cyan]")
     console.print(f"  Verify: [cyan]{'Sí' if verify else 'No'}[/cyan]\n")
 
-    with Progress(
-        SpinnerColumn(),
-        TextColumn("[progress.description]{task.description}"),
-        console=console,
-    ) as progress:
-        # 1. Transcribir
-        task = progress.add_task("[cyan]Transcribiendo audio...", total=None)
-        result = transcribe_audio(str(audio_path), model=model, language=lang if lang != "auto" else None)
-        progress.update(task, completed=True, description="[green]Transcripción completada")
+    try:
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            console=console,
+        ) as progress:
+            # 1. Transcribir
+            task = progress.add_task("[cyan]Transcribiendo audio...", total=None)
+            result = transcribe_audio(str(audio_path), model=model, language=lang if lang != "auto" else None)
+            progress.update(task, completed=True, description="[green]Transcripción completada")
 
-        # 2. Diarizar
-        task = progress.add_task("[cyan]Detectando speakers...", total=None)
-        result = diarize_audio(str(audio_path), result, num_speakers=num_speakers)
-        progress.update(task, completed=True, description="[green]Speakers detectados")
+            # 2. Diarizar
+            task = progress.add_task("[cyan]Detectando speakers...", total=None)
+            result = diarize_audio(str(audio_path), result, num_speakers=num_speakers)
+            progress.update(task, completed=True, description="[green]Speakers detectados")
 
-        # 3. Proofread
-        if proofread:
-            task = progress.add_task("[cyan]Analizando confianza...", total=None)
-            result = add_confidence_markers(result)
-            progress.update(task, completed=True, description="[green]Análisis completado")
+            # 3. Proofread
+            if proofread:
+                task = progress.add_task("[cyan]Analizando confianza...", total=None)
+                result = add_confidence_markers(result)
+                progress.update(task, completed=True, description="[green]Análisis completado")
 
-        # 4. Verificar (separar voces y comparar)
-        temp_files = []
-        if verify and num_speakers and num_speakers > 1:
-            task = progress.add_task("[cyan]Separando voces...", total=None)
+            # 4. Verificar (separar voces y comparar)
+            temp_files = []
+            if verify and num_speakers and num_speakers > 1:
+                task = progress.add_task("[cyan]Separando voces...", total=None)
 
-            # Crear directorio temporal
-            temp_dir = tempfile.mkdtemp(prefix="scribe_verify_")
+                # Crear directorio temporal
+                temp_dir = tempfile.mkdtemp(prefix="scribe_verify_")
 
-            # Separar audio por speaker usando diarización
-            separated_paths = separate_by_diarization(
-                str(audio_path),
-                result["segments"],
-                num_speakers=num_speakers,
-                output_dir=temp_dir,
-            )
-            temp_files.extend(separated_paths)
-            progress.update(task, completed=True, description="[green]Voces separadas")
+                # Separar audio por speaker usando diarización
+                separated_paths = separate_by_diarization(
+                    str(audio_path),
+                    result["segments"],
+                    num_speakers=num_speakers,
+                    output_dir=temp_dir,
+                )
+                temp_files.extend(separated_paths)
+                progress.update(task, completed=True, description="[green]Voces separadas")
 
-            # Transcribir cada audio separado
-            task = progress.add_task("[cyan]Transcribiendo voces separadas...", total=None)
-            separated_transcriptions = []
-            for sep_path in separated_paths:
-                sep_result = transcribe_audio(sep_path, model=model, language=lang if lang != "auto" else None)
-                separated_transcriptions.append(sep_result)
-            progress.update(task, completed=True, description="[green]Voces transcritas")
+                # Transcribir cada audio separado
+                task = progress.add_task("[cyan]Transcribiendo voces separadas...", total=None)
+                separated_transcriptions = []
+                for sep_path in separated_paths:
+                    sep_result = transcribe_audio(sep_path, model=model, language=lang if lang != "auto" else None)
+                    separated_transcriptions.append(sep_result)
+                progress.update(task, completed=True, description="[green]Voces transcritas")
 
-            # Comparar transcripciones
-            task = progress.add_task("[cyan]Comparando transcripciones...", total=None)
-            result = compare_transcriptions(result, separated_transcriptions)
-            progress.update(task, completed=True, description="[green]Verificación completada")
+                # Comparar transcripciones
+                task = progress.add_task("[cyan]Comparando transcripciones...", total=None)
+                result = compare_transcriptions(result, separated_transcriptions)
+                progress.update(task, completed=True, description="[green]Verificación completada")
 
-            # Limpiar archivos temporales
-            cleanup_temp_files(temp_files)
+                # Limpiar archivos temporales
+                cleanup_temp_files(temp_files)
 
-        # 5. Exportar
-        task = progress.add_task("[cyan]Exportando resultados...", total=None)
+            # 5. Exportar
+            task = progress.add_task("[cyan]Exportando resultados...", total=None)
 
-        output_dir = audio_path.parent
-        exported_files = []
+            output_dir = audio_path.parent
+            exported_files = []
 
-        for fmt in format_list:
-            output_path = output_dir / f"{output_base}.{fmt}"
+            for fmt in format_list:
+                output_path = output_dir / f"{output_base}.{fmt}"
 
-            if fmt == "json":
-                export_json(result, output_path)
-            elif fmt == "srt":
-                export_srt(result, output_path)
-            elif fmt == "txt":
-                export_txt(result, output_path)
-            elif fmt == "docx":
-                export_docx(result, output_path)
+                if fmt == "json":
+                    export_json(result, output_path)
+                elif fmt == "srt":
+                    export_srt(result, output_path)
+                elif fmt == "txt":
+                    export_txt(result, output_path)
+                elif fmt == "docx":
+                    export_docx(result, output_path)
 
-            exported_files.append(output_path)
+                exported_files.append(output_path)
 
-        progress.update(task, completed=True, description="[green]Exportación completada")
+            progress.update(task, completed=True, description="[green]Exportación completada")
 
-    console.print("\n[bold green]Listo![/bold green] Archivos generados:\n")
-    for f in exported_files:
-        console.print(f"  [cyan]{f}[/cyan]")
-    console.print()
+        console.print("\n[bold green]Listo![/bold green] Archivos generados:\n")
+        for f in exported_files:
+            console.print(f"  [cyan]{f}[/cyan]")
+        console.print()
+
+    except Exception as e:
+        report_error(e, context="CLI - transcribiendo audio")
+        console.print(f"\n[red]Error: {e}[/red]")
+        console.print("[dim]Este error fue reportado automáticamente.[/dim]")
 
 
 if __name__ == "__main__":
