@@ -8,7 +8,7 @@ import requests
 from . import __version__
 
 # Token con permisos solo para crear issues en IOL68/scribe
-GITHUB_TOKEN = "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"
+GITHUB_TOKEN = "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"
 REPO = "IOL68/scribe"
 
 
